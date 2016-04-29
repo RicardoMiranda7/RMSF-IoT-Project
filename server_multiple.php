@@ -2,6 +2,9 @@
 <?php 
 define("IPServer", "192.168.0.104");
 define("PORTServer", 1907);
+define("HOST","db.ist.utl.pt");
+define("USER", "ist175847");
+define("PASS", "sgks0281");
 
 
 /** 
@@ -144,15 +147,37 @@ function handle_client($ssock, $csock)
     } 
 } 
 
+function AccessDatabaseLogin($Email, $Passwd){
+   $dsn = sprintf("mysql:host=%s;dbname=%s", HOST, USER);
+   try{
+            $connection = new PDO($dsn, USER, PASS);
+    }
+    catch(PDOException $exception){
+        echo($exception->getMessage());exit();
+    }
+    $VerifyEmail = "SELECT Email FROM Person WHERE Email = '$Email' ";
+    $EmailResult = $connection->query($VerifyEmail);
+    if ($EmailResult == FALSE){
+        $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
+    }
+    if($EmailResult == NULL) return "NOK EMAIL";
+    else{
+        $VerifyPasswd = "SELECT Name FROM Person WHERE Password = '$Passwd' AND Email = '$Email'";
+        $EmailResult = $connection->query($VerifyPasswd);
+        if ($EmailResult == FALSE){
+            $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
+        }
+        if($PasswordResult == NULL) return "NOK PASSWD";
+        else return "OK";
+    }
+}
+
 function AccessDatabase($mode, $packet_seq_nr=NULL, $packet_time=NULL, $packet_node_nr=NULL)
 {
 		GLOBAL $last_time_java;
-		$host = "db.ist.utl.pt";
-		$user = "ist175847";
-		$pass = "sgks0281";
-		$dsn = "mysql:host=$host;dbname=$user";
+		 $dsn = sprintf("mysql:host=%s;dbname=%s", HOST, USER);
 		try{
-			$connection = new PDO($dsn, $user, $pass);
+			$connection = new PDO($dsn, USER, PASS);
 		}
 		catch(PDOException $exception){
 			echo("<p>Error: ");
@@ -202,7 +227,7 @@ function AccessDatabase($mode, $packet_seq_nr=NULL, $packet_time=NULL, $packet_n
 					exit();
 				}
 				return 1;
-				
+			
 
 				/*
 				echo "$result\n";
@@ -213,6 +238,8 @@ function AccessDatabase($mode, $packet_seq_nr=NULL, $packet_time=NULL, $packet_n
 					return $result;  // App needs to be notified
 				}*/
 				break;
+
+          
 			}
 
 }
@@ -247,6 +274,8 @@ function interact($socket)
                 switch ($MsgParameters[1]) {
                     case 'LOGIN':
                         echo "LOGIN\n";
+                        $str = AccessDatabaseLogin($MsgParameters[2], $MsgParameters[3]);
+                        socket_write($socket, $str, strlen($str));
                         break;
                     case 'REGISTER':
                         echo "REGISTER\n";
