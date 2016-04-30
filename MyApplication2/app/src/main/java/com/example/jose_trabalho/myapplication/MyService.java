@@ -59,7 +59,7 @@ public class MyService extends Service{
                     if(message != null) {
                         if (message.regionMatches(0, "ALARM", 0, 5)) {
                             Log.d("New ALARM at ", message);
-                            MainActivity.runOnUI(new Runnable() {
+                            UserArea.runOnUI(new Runnable() {
                                 public void run() {
                                     Vibrator v = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
                                     // Vibrate for 500 milliseconds
@@ -86,7 +86,7 @@ public class MyService extends Service{
                             //Toast.makeText(getApplicationContext(), "\"No motion detected. Your home is safe!", Toast.LENGTH_LONG).show();
                         }
                     }else {
-                        MainActivity.runOnUI(new Runnable() {
+                        UserArea.runOnUI(new Runnable() {
                             public void run() {
                                 Toast.makeText(getApplicationContext(), "Couldn't reach server. Closing...", Toast.LENGTH_SHORT).show();
                             }

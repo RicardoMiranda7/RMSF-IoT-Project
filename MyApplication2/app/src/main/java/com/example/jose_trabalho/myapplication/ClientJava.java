@@ -13,9 +13,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
+class IPandPORT {
+    int PHPServer_Port = 1901;
+    String PHPServer_IP = "192.168.0.102";
+        }
 
 public class ClientJava {
     private Socket socket;
+
+
 
     public ClientJava(String server, int port){
         try {
@@ -58,6 +64,10 @@ public class ClientJava {
             e.printStackTrace();
         }
         return message;
+
+    }
+    public void Close() throws IOException {
+        this.socket.close();
 
     }
 

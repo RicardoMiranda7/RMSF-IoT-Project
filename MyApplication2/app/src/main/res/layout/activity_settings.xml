@@ -15,7 +15,7 @@
         android:text="Settings"
         android:id="@+id/textView6"
         android:textStyle="bold"
-        android:textSize="40sp"
+        android:textSize="32sp"
         android:gravity="center"
         android:textColor="#458B00"
         android:textIsSelectable="false"

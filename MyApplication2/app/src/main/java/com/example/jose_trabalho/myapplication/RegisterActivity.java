@@ -14,8 +14,7 @@ import java.net.ContentHandler;
 import java.util.concurrent.TimeUnit;
 
 public class RegisterActivity extends AppCompatActivity {
-    private int PHPServer_Port = 1907;
-    private String PHPServer_IP = "192.168.0.105";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
