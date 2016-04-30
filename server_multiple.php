@@ -155,20 +155,21 @@ function AccessDatabaseLogin($Email, $Passwd){
     catch(PDOException $exception){
         echo($exception->getMessage());exit();
     }
-    $VerifyEmail = "SELECT Email FROM Person WHERE Email = '$Email' ";
+    $VerifyEmail = "SELECT * FROM Person WHERE Email = '$Email' ";
     $EmailResult = $connection->query($VerifyEmail);
     if ($EmailResult == FALSE){
         $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
     }
-    if($EmailResult == NULL) return "NOK EMAIL";
+    if (($EmailResult->rowCount())==0) return "NOK EMAIL";
     else{
-        $VerifyPasswd = "SELECT Name FROM Person WHERE Password = '$Passwd' AND Email = '$Email'";
-        $EmailResult = $connection->query($VerifyPasswd);
+        $VerifyPasswd = "SELECT * FROM Person WHERE Password = '$Passwd' AND Email = '$Email'";
+        $PasswordResult = $connection->query($VerifyPasswd);
         if ($EmailResult == FALSE){
             $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
         }
-        if($PasswordResult == NULL) return "NOK PASSWD";
-        else return "OK";
+        echo"Passwd: [";echo $Passwd;echo"] ";echo "RowCount: ";echo ($PasswordResult->rowCount());echo"\n";
+        if (($PasswordResult->rowCount())==0){ return "NOK PASSWD";
+        }else {return "OK";}
     }
 }
 
@@ -254,8 +255,12 @@ function interact($socket)
             echo "socket_read() failed: reason: " . socket_strerror(socket_last_error($socket)) . "\n";
             //break 2;
         }
-        $MsgParameters = explode(" ", $buff);
-        echo $MsgParameters;
+        $newbuf=str_replace("\n","",$buf);
+        $MsgParameters = explode(" ", $newbuf);
+        foreach($MsgParameters as $MsgParameter){
+			echo $MsgParameter;echo " ";
+		}
+		echo "\n";
         switch ($MsgParameters[0]) {
             case 'BASE':
                         //echo "BASE detected! ";
