@@ -219,6 +219,7 @@ function AccessDatabaseRegister($Name, $Email, $PANid, $PANsk){
             $GeneratedPasswd = implode($GeneratedPasswdArray);
             echo"Password Generated for user $Name \n";
             $InsertData = "INSER INTO Person VALUES('$Email', '$Email', '$GeneratedPasswd', '0')";
+	mail('$Email', 'THanks for you register in HomeSecurity!', 'Hello!\nYour password for accessing the HomeSecurity App is: $GeneratedPasswd.\n Thanks,\JosE & Diogo - @RMSF 2015/2016 Antonio Grilo - IST - ULISBOA' );
             return "OK";
         }
     }
@@ -340,6 +341,8 @@ echo"4 Arg: ";echo$MsgParameters[3];echo"_";echo"\n";
                         break;
                     case 'REGISTER':
                         echo "[REGISTER]\n";
+			 $str = AccessDatabaseRegister($MsgParameters[3], $MsgParameters[4], $MsgParameters[5], $MsgParameters[6]);
+socket_write($socket, $str, strlen($str));
                         break;
                     case 'ADD':
                         echo "[ADD]\n";
@@ -405,4 +408,6 @@ function become_daemon()
 } 
 
 ?>
+
+
 
