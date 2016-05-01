@@ -1,6 +1,6 @@
 #!/usr/bin/php -q 
 <?php 
-define("IPServer", "192.168.0.102");
+define("IPServer", "192.168.0.103");
 define("PORTServer", 1901);
 define("HOST","db.ist.utl.pt");
 define("USER", "ist175847");
@@ -174,6 +174,41 @@ function AccessDatabaseLogin($Email, $Passwd){
     }
 }
 
+    function generateRandomString($length) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        return $randomString;
+    }
+function SendMail($Email, $Name,$GeneratedPasswd)
+{
+	$to = $Email;
+
+$subject = 'Website Change Reqest';
+
+$headers = "From: Home Security Project\r\n";
+
+$headers .= "MIME-Version: 1.0\r\n";
+
+$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+
+
+$message = '<html><body>';
+$message .= '<p>Hi ';
+$message .= $Name;
+$message .= ',</p>';
+$message .= '<p>Thanks for you register in HomeSecurity! Your password for accessing the HomeSecurity App is: ';
+$message .= $GeneratedPasswd;
+$message .= '</p>';
+$message .= '<p>Thanks,</p>';
+$message .= '<p>Jose & Diogo - @RMSF 2015/2016 Antonio Grilo - IST - ULISBOA</p>';
+$message .= '</body></html>';
+
+
+mail($to, $subject, $message, $headers);
+}
 function AccessDatabaseRegister($Name, $Email, $PANid, $PANsk){
    $dsn = sprintf("mysql:host=%s;dbname=%s", HOST, USER);
    try{
@@ -190,7 +225,7 @@ function AccessDatabaseRegister($Name, $Email, $PANid, $PANsk){
     echo"PANid: [";echo $PANid;echo"] ";echo "RowCount: ";echo ($PANidResult->rowCount());echo"\n";
     if (($PANidResult->rowCount())==0) return "NOK PANID";
     else{
-        $VerifyPANsk = "SELECT * FROM Person WHERE Password = '$Passwd' AND idPAN = '$PANid'";
+        $VerifyPANsk = "SELECT * FROM PAN WHERE Serial_key = '$PANsk' AND idPAN = '$PANid'";
         $PANskResult = $connection->query($VerifyPANsk);
         if ($PANskResult == FALSE){
             $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
@@ -198,28 +233,20 @@ function AccessDatabaseRegister($Name, $Email, $PANid, $PANsk){
         echo"PAN SK: [";echo $PANsk;echo"] ";echo "RowCount: ";echo ($PANskResult->rowCount());echo"\n";
         if (($PANskResult->rowCount())==0){ return "NOK PANSK";
         }else {
+		$GeneratedPasswd = generateRandomString(6);
+            echo"Password Generated for user $Name\n";
+            $InsertData = "INSERT INTO Person VALUES('$Email', '$Name', '$GeneratedPasswd', '0')";
+	$InsertResult = $connection->query($InsertData);
+    	if ($InsertResult == FALSE){
+        	$info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
+    	}
+ 	$InsertData = "INSERT INTO PersonPAN VALUES('$Email', '$PANid', '1')";
+	$InsertResult = $connection->query($InsertData);
+    	if ($InsertResult == FALSE){
+       	 $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
+    	}
 
-            for ($i=0; $i < 5; $i++) { 
-                $GeneratedInterval = random_int (1 , 3);
-                switch ($GeneratedInterval) {
-                    case (1):
-                        $min = 48; $max = 57; //Numbers
-                        break;
-                    
-                    case(2):
-                        $min = 65; $max = 90;   //Capital letters
-                        break;
-
-                    case(3):
-                        $min = 97; $max = 122;  // Low Case letters
-                        break;
-                }
-                $GeneratedPasswdArray[i] = char(random_int ($min , $max));
-            }
-            $GeneratedPasswd = implode($GeneratedPasswdArray);
-            echo"Password Generated for user $Name \n";
-            $InsertData = "INSER INTO Person VALUES('$Email', '$Email', '$GeneratedPasswd', '0')";
-	mail('$Email', 'THanks for you register in HomeSecurity!', 'Hello!\nYour password for accessing the HomeSecurity App is: $GeneratedPasswd.\n Thanks,\JosE & Diogo - @RMSF 2015/2016 Antonio Grilo - IST - ULISBOA' );
+	SendMail($Email,$Name,$GeneratedPasswd);
             return "OK";
         }
     }
@@ -335,13 +362,13 @@ echo"4 Arg: ";echo$MsgParameters[3];echo"_";echo"\n";
                 switch ($MsgParameters[1]) {
                     case 'LOGIN':
                         echo "[LOGIN]\n";
-                        $str = AccessDatabaseLogin($MsgParameters[3], $MsgParameters[4]);
+                        $str = AccessDatabaseLogin($MsgParameters[2], $MsgParameters[3]);
                         socket_write($socket, $str, strlen($str));
                         echo"Sent: ";echo($str);
                         break;
                     case 'REGISTER':
                         echo "[REGISTER]\n";
-			 $str = AccessDatabaseRegister($MsgParameters[3], $MsgParameters[4], $MsgParameters[5], $MsgParameters[6]);
+			 $str = AccessDatabaseRegister($MsgParameters[2], $MsgParameters[3], $MsgParameters[4], $MsgParameters[5]);
 socket_write($socket, $str, strlen($str));
                         break;
                     case 'ADD':
