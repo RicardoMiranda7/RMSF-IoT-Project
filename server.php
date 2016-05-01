@@ -160,7 +160,7 @@ function AccessDatabaseLogin($Email, $Passwd){
     if ($EmailResult == FALSE){
         $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
     }
-echo"Email: [";echo $Email;echo"] ";echo "RowCount: ";echo ($EmailResult->rowCount());echo"\n";
+    echo"Email: [";echo $Email;echo"] ";echo "RowCount: ";echo ($EmailResult->rowCount());echo"\n";
     if (($EmailResult->rowCount())==0) return "NOK EMAIL";
     else{
         $VerifyPasswd = "SELECT * FROM Person WHERE Password = '$Passwd' AND Email = '$Email'";
@@ -171,6 +171,56 @@ echo"Email: [";echo $Email;echo"] ";echo "RowCount: ";echo ($EmailResult->rowCou
         echo"Passwd: [";echo $Passwd;echo"] ";echo "RowCount: ";echo ($PasswordResult->rowCount());echo"\n";
         if (($PasswordResult->rowCount())==0){ return "NOK PASSWD";
         }else {return "OK";}
+    }
+}
+
+function AccessDatabaseRegister($Name, $Email, $PANid, $PANsk){
+   $dsn = sprintf("mysql:host=%s;dbname=%s", HOST, USER);
+   try{
+            $connection = new PDO($dsn, USER, PASS);
+    }
+    catch(PDOException $exception){
+        echo($exception->getMessage());exit();
+    }
+    $VerifyPANid = "SELECT * FROM PAN WHERE idPAN = '$PANid'";
+    $PANidResult = $connection->query($VerifyPANid);
+    if ($PANidResult == FALSE){
+        $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
+    }
+    echo"PANid: [";echo $PANid;echo"] ";echo "RowCount: ";echo ($PANidResult->rowCount());echo"\n";
+    if (($PANidResult->rowCount())==0) return "NOK PANID";
+    else{
+        $VerifyPANsk = "SELECT * FROM Person WHERE Password = '$Passwd' AND idPAN = '$PANid'";
+        $PANskResult = $connection->query($VerifyPANsk);
+        if ($PANskResult == FALSE){
+            $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
+        }
+        echo"PAN SK: [";echo $PANsk;echo"] ";echo "RowCount: ";echo ($PANskResult->rowCount());echo"\n";
+        if (($PANskResult->rowCount())==0){ return "NOK PANSK";
+        }else {
+
+            for ($i=0; $i < 5; $i++) { 
+                $GeneratedInterval = random_int (1 , 3);
+                switch ($GeneratedInterval) {
+                    case (1):
+                        $min = 48; $max = 57; //Numbers
+                        break;
+                    
+                    case(2):
+                        $min = 65; $max = 90;   //Capital letters
+                        break;
+
+                    case(3):
+                        $min = 97; $max = 122;  // Low Case letters
+                        break;
+                }
+                $GeneratedPasswdArray[i] = char(random_int ($min , $max));
+            }
+            $GeneratedPasswd = implode($GeneratedPasswdArray);
+            echo"Password Generated for user $Name \n";
+            $InsertData = "INSER INTO Person VALUES('$Email', '$Email', '$GeneratedPasswd', '0')";
+            return "OK";
+        }
     }
 }
 
@@ -283,16 +333,16 @@ echo"4 Arg: ";echo$MsgParameters[3];echo"_";echo"\n";
             case 'JAVA':
                 switch ($MsgParameters[1]) {
                     case 'LOGIN':
-                        echo "LOGIN!!\n";
+                        echo "[LOGIN]\n";
                         $str = AccessDatabaseLogin($MsgParameters[3], $MsgParameters[4]);
                         socket_write($socket, $str, strlen($str));
-echo"Sent: ";echo($str);
+                        echo"Sent: ";echo($str);
                         break;
                     case 'REGISTER':
-                        echo "REGISTER\n";
+                        echo "[REGISTER]\n";
                         break;
                     case 'ADD':
-                        echo "ADD\n";
+                        echo "[ADD]\n";
                         break;  
                     case 'MODIFY':
                         # code...
