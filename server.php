@@ -147,7 +147,7 @@ function handle_client($ssock, $csock)
     } 
 } 
 
-function DBRetrieveSettings($PANid){
+function DBBaseStationRequest($PANid){
    $dsn = sprintf("mysql:host=%s;dbname=%s", HOST, USER);
    try{
             $connection = new PDO($dsn, USER, PASS);
@@ -163,6 +163,63 @@ $Result->execute();
     }
 
     
+	$Settings = $Result->fetch(PDO::FETCH_ASSOC);
+//echo("idPAN: " + $Result->idPAN + "	Buzzer: " + $Result->Buzzer + "\n");
+	echo"Base Station Settings: ";echo($Settings['Buzzer']);echo($Settings['Propagation']);echo"\n";
+//print_r($Result);
+return $Settings;
+
+}
+
+function DBBaseStationSensorSettings($PANid){
+   $dsn = sprintf("mysql:host=%s;dbname=%s", HOST, USER);
+   try{
+            $connection = new PDO($dsn, USER, PASS);
+    }
+    catch(PDOException $exception){
+        echo($exception->getMessage());exit();
+    }
+    $RetrieveSettings= "SELECT * FROM Node WHERE idPAN = '$PANid' ;";
+    $Result = $connection->prepare($RetrieveSettings);
+$Result->execute();
+    if ( $Result  == FALSE){
+        $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
+    }
+
+    $i=1;
+    echo"Base Station Sensor Settings: ";
+	while($Settings = $Result->fetch(PDO::FETCH_ASSOC)){
+		echo($Array[$i] = $Settings['idNode']);
+		$i++;
+		echo($Array[$i] = $Settings['Activated']);
+		$i++;
+	}
+	echo " ";
+	echo($Array[1]); echo($Array[2]); echo($Array[3]); echo($Array[4]);
+//echo("idPAN: " + $Result->idPAN + "	Buzzer: " + $Result->Buzzer + "\n");
+
+//print_r($Result);
+return $Array;
+
+}
+
+
+
+function DBRetrieveSettings($PANid){
+   $dsn = sprintf("mysql:host=%s;dbname=%s", HOST, USER);
+   try{
+            $connection = new PDO($dsn, USER, PASS);
+    }
+    catch(PDOException $exception){
+        echo($exception->getMessage());exit();
+    }
+    $RetrieveSettings= "SELECT * FROM PAN WHERE idPAN = '$PANid' ;";
+    $Result = $connection->prepare($RetrieveSettings);
+$Result->execute();
+    if ( $Result  == FALSE){
+        $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
+    }
+
 	$BuzzerPropagation = $Result->fetch(PDO::FETCH_ASSOC);
 //echo("idPAN: " + $Result->idPAN + "	Buzzer: " + $Result->Buzzer + "\n");
 	echo"Result2: ";echo($BuzzerPropagation['Buzzer']);echo($BuzzerPropagation['Propagation']);echo"\n";
@@ -400,18 +457,32 @@ echo"3 Arg: ";echo$MsgParameters[2];echo"_";echo"\n";
 echo"4 Arg: ";echo$MsgParameters[3];echo"_";echo"\n";
         switch ($MsgParameters[0]) {
             case 'BASE':
-                        //echo "BASE detected! ";
-                    // Comunicar com base de dados
-                    //AccessDatabase('insert',);
-                //$last_time_base_sation;
-                $packet_tstamp = new DateTime();
-                list($protocol_msg, $tstamp, $packet_seqno) = sscanf($buf, "%s %d %d");
-                $packet_tstamp->setTimestamp($tstamp);
-                $i = AccessDatabase('insert', $packet_seqno, $packet_tstamp->format('Y-m-d H:i:s'), 1);
-                echo "Sequence Nr: $packet_seqno    Time stamp: ";
-                echo ($packet_tstamp->format('Y-m-d H:i:s')); // Se mandar o U como argumento vai o inteiro UNIX
-                echo "  returned: $i\n";
+                 echo "BASE detected! ";
+                 switch ($MsgParameters[1]) {
+					 case 'NOTIFICATION':
+						// Comunicar com base de dados
+						//AccessDatabase('insert',);
+						//$last_time_base_sation;
+						$packet_tstamp = new DateTime();
+						list($protocol_msg, $tstamp, $packet_seqno) = sscanf($buf, "%s %d %d");
+						$packet_tstamp->setTimestamp($tstamp);
+						$i = AccessDatabase('insert', $packet_seqno, $packet_tstamp->format('Y-m-d H:i:s'), 1);
+						echo "Sequence Nr: $packet_seqno    Time stamp: ";
+						echo ($packet_tstamp->format('Y-m-d H:i:s')); // Se mandar o U como argumento vai o inteiro UNIX
+						echo "  returned: $i\n";
+						break;
+					case 'REQSETS':
+						echo(" New Resquest\n");
+						$GeneralSettings = DBBaseStationRequest($MsgParameters[2]);
+						$SensorSettings = DBBaseStationSensorSettings($MsgParameters[2]);
+						$str = sprintf("OK %d %d %d %d %d %d %d", $GeneralSettings['Enable'], $GeneralSettings['Buzzer'], $GeneralSettings['Propagation'],$SensorSettings[1],$SensorSettings[2],$SensorSettings[3],$SensorSettings[4]);
+						echo("Sent [Enabled] [Buzzer] [Propagation] [NodeID1] [Enabled1] [NodeID2] [Enabled2]: "); echo($str);
+                        socket_write($socket, $str, strlen($str));
+                        
+						
+				}	
                 break;
+			
             case 'JAVA':
                 switch ($MsgParameters[1]) {
                     case 'LOGIN':
@@ -422,22 +493,22 @@ echo"4 Arg: ";echo$MsgParameters[3];echo"_";echo"\n";
                         break;
                     case 'REGISTER':
                         echo "[REGISTER]\n";
-			 $str = AccessDatabaseRegister($MsgParameters[2], $MsgParameters[3], $MsgParameters[4], $MsgParameters[5]);
-socket_write($socket, $str, strlen($str));
+						$str = AccessDatabaseRegister($MsgParameters[2], $MsgParameters[3], $MsgParameters[4], $MsgParameters[5]);
+						socket_write($socket, $str, strlen($str));
                         break;
                     case 'ADD':
                         echo "[ADD]\n";
                         break;  
                     case 'MODIFY':
                         echo "[MODIFY]\n";
-			$str = DBModifyBuzzer($MsgParameters[2], $MsgParameters[3], $MsgParameters[4]);
+						$str = DBModifyBuzzer($MsgParameters[2], $MsgParameters[3], $MsgParameters[4]);
                         socket_write($socket, $str, strlen($str));
                         break;
                     case 'RETRIEVE':
-			echo "[RETRIEVE]\n";
-			$Array = DBRetrieveSettings($MsgParameters[2]);
-			$str = sprintf("OK %d %d %d", $Array['Enable'], $Array['Buzzer'], $Array['Propagation']);
-echo("Sent: "); echo($str);
+						echo "[RETRIEVE]\n";
+						$Settings = DBRetrieveSettings($MsgParameters[2]);
+						$str = sprintf("OK %d %d %d", $Settings['Enable'], $Settings['Buzzer'], $Settings['Propagation']);
+						echo("Sent: "); echo($str);
                         socket_write($socket, $str, strlen($str));
 			
                         break;
@@ -446,10 +517,11 @@ echo("Sent: "); echo($str);
                             echo "Read from database; "; echo($notified['notified']); echo "\n";
                             if(!$notified['notified']) {
                                 //echo "Notified: $notified; ";
-                                $str = sprintf("ALARM %d %d", time($notified['tstamp']), $notified['sequence_nr']); 
-                                socket_write($socket, $str, strlen($str));
+								$str = sprintf("ALARM %d %d", time($notified['tstamp']), $notified['sequence_nr']); 
+								socket_write($socket, $str, strlen($str));
                                 AccessDatabase('update');
                                 echo "Updated;\n";
+                                // Esperar por uma repsosta para desactivar o alarme
                             }else{
                                 socket_write($socket, "UPTODATE", strlen("UPTODATE"));
                             }   
