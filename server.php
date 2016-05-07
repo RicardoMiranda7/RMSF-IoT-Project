@@ -184,30 +184,26 @@ function AccessDatabaseLogin($Email, $Passwd){
     }
 function SendMail($Email, $Name,$GeneratedPasswd)
 {
-	$to = $Email;
+    $to = $Email;
 
-$subject = 'Website Change Reqest';
+    $subject = 'Website Change Reqest';
+    $headers = "From: Home Security Project\r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 
-$headers = "From: Home Security Project\r\n";
-
-$headers .= "MIME-Version: 1.0\r\n";
-
-$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-
-
-$message = '<html><body>';
-$message .= '<p>Hi ';
-$message .= $Name;
-$message .= ',</p>';
-$message .= '<p>Thanks for you register in HomeSecurity! Your password for accessing the HomeSecurity App is: ';
-$message .= $GeneratedPasswd;
-$message .= '</p>';
-$message .= '<p>Thanks,</p>';
-$message .= '<p>Jose & Diogo - @RMSF 2015/2016 Antonio Grilo - IST - ULISBOA</p>';
-$message .= '</body></html>';
+    $message = '<html><body>';
+    $message .= '<p>Hi ';
+    $message .= $Name;
+    $message .= ',</p>';
+    $message .= '<p>Thanks for you register in HomeSecurity! Your password for accessing the HomeSecurity App is: ';
+    $message .= $GeneratedPasswd;
+    $message .= '</p>';
+    $message .= '<p>Thanks,</p>';
+    $message .= '<p>Jose & Diogo - @RMSF 2015/2016 Antonio Grilo - IST - ULISBOA</p>';
+    $message .= '</body></html>';
 
 
-mail($to, $subject, $message, $headers);
+    mail($to, $subject, $message, $headers);
 }
 function AccessDatabaseRegister($Name, $Email, $PANid, $PANsk){
    $dsn = sprintf("mysql:host=%s;dbname=%s", HOST, USER);
@@ -234,20 +230,19 @@ function AccessDatabaseRegister($Name, $Email, $PANid, $PANsk){
         if (($PANskResult->rowCount())==0){ return "NOK PANSK";
         }else {
 		$GeneratedPasswd = generateRandomString(6);
-            echo"Password Generated for user $Name\n";
-            $InsertData = "INSERT INTO Person VALUES('$Email', '$Name', '$GeneratedPasswd', '0')";
-	$InsertResult = $connection->query($InsertData);
+        echo"Password Generated for user $Name\n";
+        $InsertData = "INSERT INTO Person VALUES('$Email', '$Name', '$GeneratedPasswd', '0')";
+	    $InsertResult = $connection->query($InsertData);
     	if ($InsertResult == FALSE){
         	$info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
     	}
- 	$InsertData = "INSERT INTO PersonPAN VALUES('$Email', '$PANid', '1')";
-	$InsertResult = $connection->query($InsertData);
+ 	    $InsertData = "INSERT INTO PersonPAN VALUES('$Email', '$PANid', '1')";
+	    $InsertResult = $connection->query($InsertData);
     	if ($InsertResult == FALSE){
-       	 $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
+       	    $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
     	}
-
-	SendMail($Email,$Name,$GeneratedPasswd);
-            return "OK";
+        SendMail($Email,$Name,$GeneratedPasswd);
+        return "OK";
         }
     }
 }
@@ -334,16 +329,16 @@ function interact($socket)
             echo "socket_read() failed: reason: " . socket_strerror(socket_last_error($socket)) . "\n";
             //break 2;
         }
-echo"Received: [";echo $buf;echo"] ";echo"\n";
+        echo"Received: [";echo $buf;echo"] ";echo"\n";
         $newbuf=str_replace("\n","",$buf);
-echo"Newbuf: [";echo $buf;echo"] ";echo"\n";
+        echo"Newbuf: [";echo $buf;echo"] ";echo"\n";
         $MsgParameters = explode(" ", $newbuf);
         foreach($MsgParameters as $MsgParameter){
 			echo $MsgParameter;echo " ";
 		}
 		echo "\n";
-echo"3 Arg: ";echo$MsgParameters[2];echo"_";echo"\n";
-echo"4 Arg: ";echo$MsgParameters[3];echo"_";echo"\n";
+        echo"3 Arg: ";echo$MsgParameters[2];echo"_";echo"\n";
+        echo"4 Arg: ";echo$MsgParameters[3];echo"_";echo"\n";
         switch ($MsgParameters[0]) {
             case 'BASE':
                         //echo "BASE detected! ";
@@ -368,8 +363,8 @@ echo"4 Arg: ";echo$MsgParameters[3];echo"_";echo"\n";
                         break;
                     case 'REGISTER':
                         echo "[REGISTER]\n";
-			 $str = AccessDatabaseRegister($MsgParameters[2], $MsgParameters[3], $MsgParameters[4], $MsgParameters[5]);
-socket_write($socket, $str, strlen($str));
+			             $str = AccessDatabaseRegister($MsgParameters[2], $MsgParameters[3], $MsgParameters[4], $MsgParameters[5]);
+                        socket_write($socket, $str, strlen($str));
                         break;
                     case 'ADD':
                         echo "[ADD]\n";
