@@ -20,14 +20,13 @@
         android:inputType="textEmailAddress"
         android:ems="10"
         android:id="@+id/etEmail"
-        android:textSize="28dp"
+        android:textSize="24dp"
         android:textAlignment="center"
         android:hint="Email Address"
         style="@style/Base.Widget.AppCompat.EditText"
         android:layout_above="@+id/etPassword"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="35dp" />
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -36,11 +35,12 @@
         android:ems="10"
         android:id="@+id/etPassword"
         android:textAlignment="center"
-        android:textSize="28dp"
+        android:textSize="24dp"
         android:hint="Password"
         style="@style/Base.Widget.AppCompat.EditText"
-        android:layout_marginBottom="24dp"
-        android:layout_above="@+id/tvEmailError"
+        android:layout_above="@+id/etServerIP"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -94,8 +94,7 @@
         android:layout_alignLeft="@+id/bRegister"
         android:layout_alignStart="@+id/bRegister"
         android:layout_alignRight="@+id/bRegister"
-        android:layout_alignEnd="@+id/bRegister"
-        />
+        android:layout_alignEnd="@+id/bRegister" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -126,4 +125,19 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:visibility="invisible" />
+
+    <EditText
+        style="@style/Base.Widget.AppCompat.EditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/etServerIP"
+        android:textSize="24dp"
+        android:textAlignment="center"
+        android:hint="Server IP Adress"
+        android:layout_alignBottom="@+id/tvEmailError"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:inputType="text"
+        android:editable="true" />
 </RelativeLayout>

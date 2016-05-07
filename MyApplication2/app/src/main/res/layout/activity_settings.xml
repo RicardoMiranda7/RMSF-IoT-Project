@@ -34,21 +34,9 @@
         android:layout_alignBottom="@+id/textView6"
         android:layout_alignTop="@+id/textView6" />
 
-    <ToggleButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New ToggleButton"
-        android:id="@+id/toggleButton"
-        android:checked="false"
-        android:background="@drawable/apptheme_btn_toggle_holo_light"
-        android:layout_alignBottom="@+id/textView8"
-        android:layout_alignLeft="@+id/toggleButton2"
-        android:layout_alignStart="@+id/toggleButton2"
-        android:layout_alignTop="@+id/textView8" />
-
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="33dp"
+        android:layout_height="50dp"
         android:text="Buzzer"
         android:id="@+id/textView8"
         android:textStyle="bold"
@@ -56,42 +44,13 @@
         android:gravity="center"
         android:textColor="#458B00"
         android:textIsSelectable="false"
-        android:layout_marginTop="31dp"
-        android:layout_below="@+id/textView6"
+        android:layout_above="@+id/textView10"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
-        android:paddingRight="50dp" />
-
-    <ToggleButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New ToggleButton"
-        android:id="@+id/toggleButton2"
-        android:checked="false"
-        android:background="@drawable/apptheme_btn_toggle_holo_light"
-        android:layout_above="@+id/textView9"
-        android:layout_alignTop="@+id/textView10"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Propagate Buzzer"
-        android:id="@+id/textView10"
-        android:textStyle="bold"
-        android:textSize="24sp"
-        android:gravity="center"
-        android:textColor="#458B00"
-        android:textIsSelectable="false"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
-        android:paddingRight="50dp"
-        android:layout_below="@+id/toggleButton"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignRight="@+id/textView11"
+        android:layout_alignEnd="@+id/textView11"
+        android:layout_marginBottom="10dp"
+        android:textAlignment="textStart" />
 
     <ListView
         android:layout_width="wrap_content"
@@ -100,8 +59,9 @@
         android:layout_row="18"
         android:layout_column="0"
         android:layout_below="@+id/textView9"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -115,10 +75,98 @@
         android:textIsSelectable="false"
         android:layout_row="17"
         android:layout_column="0"
-        android:paddingBottom="20dp"
-        android:paddingTop="20dp"
-        android:layout_below="@+id/textView10"
-        android:layout_alignLeft="@+id/lvSensors"
-        android:layout_alignStart="@+id/lvSensors" />
+        android:paddingBottom="15dp"
+        android:layout_below="@+id/swPropagation"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:paddingTop="15dp" />
+
+
+
+    <TextView
+        android:layout_width="33dp"
+        android:layout_height="50dp"
+        android:text="Propagation"
+        android:id="@+id/textView10"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:textColor="#458B00"
+        android:textIsSelectable="false"
+        android:textAlignment="textStart"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/textView6"
+        android:layout_alignEnd="@+id/textView9"
+        android:layout_marginBottom="150dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ToggleButton
+        android:layout_width="33dp"
+        android:layout_height="45dp"
+        android:id="@+id/swEnableAlarm"
+        android:onClick="toggleEnableAlarm"
+        android:text=""
+        android:textOff=""
+        android:textOn=""
+        android:background="@drawable/toggle_selector"
+        android:layout_toRightOf="@+id/textView6"
+        android:layout_alignTop="@+id/textView11"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@+id/textView11" />
+
+    <ToggleButton
+        android:layout_width="33dp"
+        android:layout_height="45dp"
+        android:id="@+id/swBuzzer"
+        android:onClick="toggleBuzzer"
+        android:text=""
+        android:textOff=""
+        android:textOn=""
+        android:background="@drawable/toggle_selector"
+        android:layout_alignBottom="@+id/textView8"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignLeft="@+id/swEnableAlarm"
+        android:layout_alignStart="@+id/swEnableAlarm"
+        android:layout_alignTop="@+id/textView8" />
+
+    <ToggleButton
+        android:id="@+id/swPropagation"
+        android:onClick="togglePropagation"
+        android:background="@drawable/toggle_selector"
+        android:text=""
+        android:textOff=""
+        android:textOn=""
+        android:layout_width="33dp"
+        android:layout_height="45dp"
+        android:layout_alignBottom="@+id/textView10"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignLeft="@+id/swBuzzer"
+        android:layout_alignStart="@+id/swBuzzer"
+        android:layout_below="@+id/textView8" />
+
+    <TextView
+        android:layout_width="33dp"
+        android:layout_height="50dp"
+        android:text="Enabled"
+        android:id="@+id/textView11"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:textColor="#458B00"
+        android:textIsSelectable="false"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:paddingRight="50dp"
+        android:layout_above="@+id/textView8"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="10dp"
+        android:layout_alignRight="@+id/textView9"
+        android:layout_alignEnd="@+id/textView9"
+        android:textAlignment="textStart" />
 
 </RelativeLayout>

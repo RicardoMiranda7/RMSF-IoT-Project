@@ -14,7 +14,7 @@ import android.widget.ListView;
 
 public class UserArea extends AppCompatActivity {
     public static Handler UIHandler;
-
+    String ServerIP;
     static
     {
         UIHandler = new Handler(Looper.getMainLooper());
@@ -26,6 +26,11 @@ public class UserArea extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_area);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            ServerIP = extras.getString("ServerIP");
+        }
 
         //Login Fields
         final EditText etEmail = (EditText) findViewById(R.id.etEmail);
@@ -50,6 +55,7 @@ public class UserArea extends AppCompatActivity {
                 switch (position) {
                     case 0:
                        intent = new Intent(UserArea.this, Settings.class);
+                        intent.putExtra("ServerIP",ServerIP);
                         startActivity(intent);
                         break;
                     case 1:

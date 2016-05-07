@@ -15,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import junit.framework.Test;
 
 import java.io.IOException;
@@ -23,7 +24,9 @@ import java.net.PasswordAuthentication;
 public class MainActivity extends AppCompatActivity {
 
     public static Handler UIHandler;
-
+    public String Email;
+    public String ServerIP;
+    public String PANid;
     static
     {
         UIHandler = new Handler(Looper.getMainLooper());
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         //Login Fields
         final EditText etEmail = (EditText) findViewById(R.id.etEmail);
         final EditText etPassword = (EditText) findViewById(R.id.etPassword);
+        final EditText etServerIP = (EditText) findViewById(R.id.etServerIP);
         //Buttons
         final Button bSignIn = (Button) findViewById(R.id.bSignIn);
         final Button bRegister = (Button) findViewById(R.id.bRegister);
@@ -51,21 +55,24 @@ public class MainActivity extends AppCompatActivity {
         bSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new LoginTask().execute(etEmail.getText().toString(), etPassword.getText().toString());
+                ServerIP = etServerIP.getText().toString();
+                if(!ServerIP.isEmpty() && !etEmail.getText().toString().isEmpty() && !etPassword.getText().toString().isEmpty()) {
+                    new LoginTask().execute(etEmail.getText().toString(), etPassword.getText().toString());
+                }
             }
 
         });
         etEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tvEmailError.setVisibility(View.INVISIBLE); // Esconder aviso
+            tvEmailError.setVisibility(View.INVISIBLE); // Esconder aviso
             }
         });
 
         etPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tvPasswError.setVisibility(View.INVISIBLE); // Esconder aviso
+            tvPasswError.setVisibility(View.INVISIBLE); // Esconder aviso
             }
         });
 
@@ -73,8 +80,14 @@ public class MainActivity extends AppCompatActivity {
         bRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+            ServerIP = etServerIP.getText().toString();
+            if(!ServerIP.isEmpty()) {
                 Intent RegisterAdminIntent = new Intent(MainActivity.this, RegisterActivity.class);
+                RegisterAdminIntent.putExtra("ServerIP", ServerIP);
                 MainActivity.this.startActivity(RegisterAdminIntent);
+            }else{
+                Toast.makeText(getApplicationContext(), "Enter the Server IP before clicking Register.", Toast.LENGTH_LONG).show();
+            }
             }
         });
     }
@@ -89,8 +102,8 @@ public class MainActivity extends AppCompatActivity {
             //Clique no botao de Registo
             String message, Userfeedback;
             // Pedido à base de dados
-            ClientJava clientRegister = new ClientJava(new IPandPORT().PHPServer_IP, new IPandPORT().PHPServer_Port);
-            clientRegister.send_message("JAVA LOGIN " + " " + strings[0] + " " + strings[1] + "\n");
+            ClientJava clientRegister = new ClientJava(ServerIP, new IPandPORT().PHPServer_Port);
+            clientRegister.send_message("JAVA LOGIN " + strings[0] + " " + strings[1] + "\n");
             message = clientRegister.receive_message();
             try {
                 clientRegister.Close();
@@ -117,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), UserFeedback, Toast.LENGTH_SHORT).show();
             if (UserFeedback.equals("Login Successful!")){
                 Intent UserAreaIntent = new Intent(MainActivity.this, UserArea.class);
+                UserAreaIntent.putExtra("ServerIP",ServerIP);
                 MainActivity.this.startActivity(UserAreaIntent);
             }
 
