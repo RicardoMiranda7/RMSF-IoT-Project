@@ -1,11 +1,15 @@
 package com.example.jose_trabalho.myapplication;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.hardware.Sensor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -13,8 +17,13 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,27 +33,40 @@ import java.util.concurrent.TimeUnit;
 
 public class Settings extends AppCompatActivity {
 
+
+
+    class Sensor {
+        String ID = "";
+        boolean enabled;
+
+    }
+
     // Array of booleans to store toggle button status
     public boolean Buzzer;
     public boolean Propagation;
     public boolean AlarmSysEnabled;
     String PANid = "20";
     String ServerIP;
-    Switch swBuzzer ;
+    Switch swBuzzer;
     Switch swPropagation;
+    int sensorsLen;
+    View selectedListItem;
+    Sensor[] sensors = new Sensor[10];
 
-    public void toggleBuzzer(View view){
-       Buzzer = !Buzzer;
-        new ModifyTask().execute(PANid,"BUZZER", String.valueOf(Buzzer));
+
+    public void toggleBuzzer(View view) {
+        Buzzer = !Buzzer;
+        new ModifyTask().execute(PANid, "BUZZER", String.valueOf(Buzzer));
     }
 
-    public void toggleEnableAlarm(View view){
+    public void toggleEnableAlarm(View view) {
         AlarmSysEnabled = !AlarmSysEnabled;
-        new ModifyTask().execute(PANid,"ENABLE", String.valueOf(AlarmSysEnabled));
+        new ModifyTask().execute(PANid, "ENABLE", String.valueOf(AlarmSysEnabled), "GenSettings");
     }
-    public void togglePropagation(View view){
+
+    public void togglePropagation(View view) {
         Propagation = !Propagation;
-        new ModifyTask().execute(PANid, "PROPAGATION", String.valueOf(Propagation));
+        new ModifyTask().execute(PANid, "PROPAGATION", String.valueOf(Propagation), "GenSettings");
     }
 
     @Override
@@ -57,15 +79,13 @@ public class Settings extends AppCompatActivity {
             ServerIP = extras.getString("ServerIP");
         }
 
-        String[] sSensors = new String[]{"Leaving Room", "Room", "Hall"};
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, sSensors);
-        ListView lvSensors = (ListView) findViewById(R.id.lvSensors);
-        lvSensors.setAdapter(adapter);
+        for (int i = 0; i < sensors.length; i++) {
+            sensors[i] = new Sensor();
+        }
 
         Toast.makeText(getApplicationContext(), "Loading current settings from " + ServerIP, Toast.LENGTH_SHORT).show();
 
-        ToggleButton swBuzzer = (ToggleButton) findViewById(R.id.swBuzzer) ;
+        ToggleButton swBuzzer = (ToggleButton) findViewById(R.id.swBuzzer);
         ToggleButton swPropagation = (ToggleButton) findViewById(R.id.swPropagation);
         ToggleButton swAlarmEnable = (ToggleButton) findViewById(R.id.swEnableAlarm);
         //Verificar no servidor e na BD quais as configuracoes actuais
@@ -77,13 +97,74 @@ public class Settings extends AppCompatActivity {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        for (int i = 0; i < sensors.length; i++) {
+
+            if ((sensors[i].ID.compareTo("")) == 0) {
+                sensorsLen = (i);
+                break;
+            }
+        }
+        for (Sensor s : sensors) {
+            Log.d("Sensor: ", s.ID);
+            Log.d("Sensor: ", String.valueOf(s.enabled));
+
+        }
+
+
         //Passa-las para a interface gráfica
         swAlarmEnable.setChecked(Buzzer);
         swBuzzer.setChecked(Buzzer);
         Log.d("Buzzer2: ", String.valueOf(Buzzer));
         swPropagation.setChecked(Propagation);
 
-       // Toast.makeText(getApplicationContext(), "Buzzer: " + Buzzer + "     Propagation: " + Propagation, Toast.LENGTH_SHORT).show();
+        Log.d("Sensors length: ", String.valueOf(sensorsLen));
+        String[] sSensors = new String[sensorsLen];
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, sSensors);
+        ListView lvSensors = (ListView) findViewById(R.id.lvSensors);
+        lvSensors.setAdapter(adapter);
+
+
+        for (int i = 0; i < sensorsLen; i++) {
+            Log.d("i:", String.valueOf(i));
+            sSensors[i] = "ID: " + sensors[i].ID + "                      Enabled: " + String.valueOf(sensors[i].enabled);
+
+          /*  if (sensors[i].enabled == true) {
+                lvSensors.getChildAt(lvSensors.getFirstVisiblePosition()).setBackgroundColor(0x458B00);
+
+            } else {
+                lvSensors.getChildAt(i - (lvSensors.getFirstVisiblePosition() - lvSensors.getHeaderViewsCount())).setBackgroundColor(Color.WHITE);
+
+            }*/
+        }
+        //lvSensors.setBackgroundColor(Color.WHITE);
+
+        // Toast.makeText(getApplicationContext(), "Buzzer: " + Buzzer + "     Propagation: " + Propagation, Toast.LENGTH_SHORT).show();
+
+
+        lvSensors.setOnItemClickListener(new OnItemClickListener() {
+
+            public void onItemClick(AdapterView adapterView, View view, int position, long id) {
+                sensors[position].enabled = !sensors[position].enabled;
+                String msg;
+                if(sensors[position].enabled) msg = "Sensor ENABLED";
+                else msg = "Sensor DISABLED";
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                if (sensors[position].enabled == true) {
+                    adapterView.getChildAt(position).setBackgroundColor(Color.parseColor("#458B00"));
+                } else {
+                    adapterView.getChildAt(position).setBackgroundColor(Color.WHITE);
+                }
+
+                Log.d("Position: ", String.valueOf(position));
+                Log.d("ID: ", String.valueOf(id));
+                new ModifyTask().execute(PANid, String.valueOf(position + 1), String.valueOf(sensors[position].enabled), "GenSettings");
+
+            }
+        });
+        adapter.notifyDataSetChanged();
+        lvSensors.setAdapter(adapter);
+
     }
 
     private class ModifyTask extends AsyncTask<String, Void, String> {
@@ -95,9 +176,16 @@ public class Settings extends AppCompatActivity {
             String message;
             // Pedido à base de dados
             ClientJava clientRegister = new ClientJava(ServerIP, new IPandPORT().PHPServer_Port);
-            clientRegister.send_message("JAVA MODIFY " + strings[0] + " " + strings[1] + " " + (Boolean.parseBoolean(strings[2]) ? 1 : 0) + "\n");
+            switch (strings[3]) {
+                case "GenSettings":
+                    clientRegister.send_message("JAVA MODIFY " + strings[0] + " " + strings[1] + " " + (Boolean.parseBoolean(strings[2]) ? 1 : 0) + "\n");
+                    break;
+                case "Sensors":
+                    clientRegister.send_message("JAVA MODIFY " + strings[0] + " " + strings[1] + " " + (Boolean.parseBoolean(strings[2]) ? 1 : 0) + "\n");
+                    break;
+            }
             message = clientRegister.receive_message();
-
+            Log.d("Message rcv: ", message);
             try {
                 clientRegister.Close();
             } catch (IOException e) {
@@ -118,6 +206,7 @@ public class Settings extends AppCompatActivity {
         }
     }
 
+
     private class GetSettingsTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -126,7 +215,7 @@ public class Settings extends AppCompatActivity {
             // Pedido à base de dados
             ClientJava clientRegister = new ClientJava(ServerIP, new IPandPORT().PHPServer_Port);
             // strings[0] = PAN ID
-            clientRegister.send_message("JAVA RETRIEVE " + strings[0] + " ENABLE BUZZER PROPAGATION\n");
+            clientRegister.send_message("JAVA RETRIEVE " + strings[0] + "\n");
             message = clientRegister.receive_message();
             try {
                 clientRegister.Close();
@@ -138,14 +227,20 @@ public class Settings extends AppCompatActivity {
             if (message != null) {
                 if (message.regionMatches(0, "OK", 0, 2)) {
                     String[] parts = message.split(" ");
-                    AlarmSysEnabled = Integer.parseInt(parts[1])!= 0;
+                    AlarmSysEnabled = Integer.parseInt(parts[1]) != 0;
                     Buzzer = Integer.parseInt(parts[2]) != 0;
                     Propagation = Integer.parseInt(parts[3]) != 0;
 
-                    Log.d("message: ",message);
-                    Log.d("Alarm enable: ",String.valueOf( AlarmSysEnabled));
-                    Log.d("buzzer: ",String.valueOf(Buzzer));
-                    Log.d("Propagation: ",String.valueOf(Propagation));
+                    int j = 0;
+                    for (int i = 4; i < parts.length; i = i + 2) {
+                        sensors[j].ID = parts[i];
+                        sensors[j].enabled = Integer.parseInt(parts[i + 1]) != 0;
+                        j++;
+                    }
+                    Log.d("message: ", message);
+                    Log.d("Alarm enable: ", String.valueOf(AlarmSysEnabled));
+                    Log.d("buzzer: ", String.valueOf(Buzzer));
+                    Log.d("Propagation: ", String.valueOf(Propagation));
 
                 }
             }
@@ -157,9 +252,6 @@ public class Settings extends AppCompatActivity {
 
         }
     }
-
-
-
 
 
 }
