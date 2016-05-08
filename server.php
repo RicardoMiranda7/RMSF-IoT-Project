@@ -1,6 +1,6 @@
 #!/usr/bin/php -q 
 <?php 
-define("IPServer", "192.168.0.101");
+define("IPServer", "192.168.0.105");
 define("PORTServer", 1901);
 define("HOST","db.ist.utl.pt");
 define("USER", "ist175847");
@@ -310,6 +310,9 @@ function DBModifyBuzzer($PANid, $Parameter, $value){
 		case "ENABLE":
 			$Modify = "UPDATE PAN SET Enable = '$value' WHERE idPAN = '$PANid'";			
 			break;
+		default: 
+			$Modify = "UPDATE Node SET Activated = '$value' WHERE idPAN = '$PANid' AND idNode = '$Parameter'";
+			
 	}
    
     $Result = $connection->query($Modify);
@@ -318,6 +321,7 @@ function DBModifyBuzzer($PANid, $Parameter, $value){
     }
 return "OK";
 }
+
 
 
 function AccessDatabaseRegister($Name, $Email, $PANid, $PANsk){
@@ -504,11 +508,17 @@ echo"4 Arg: ";echo$MsgParameters[3];echo"_";echo"\n";
 						$str = DBModifyBuzzer($MsgParameters[2], $MsgParameters[3], $MsgParameters[4]);
                         socket_write($socket, $str, strlen($str));
                         break;
+		case 'MODSENSOR':
+                        echo "[MODIFICATE SENSOR]\n";
+			$str = DBModifyBuzzer($MsgParameters[2], $MsgParameters[3], $MsgParameters[4]);
+                        socket_write($socket, $str, strlen($str));
+                        break;
                     case 'RETRIEVE':
-						echo "[RETRIEVE]\n";
-						$Settings = DBRetrieveSettings($MsgParameters[2]);
-						$str = sprintf("OK %d %d %d", $Settings['Enable'], $Settings['Buzzer'], $Settings['Propagation']);
-						echo("Sent: "); echo($str);
+			echo "[RETRIEVE]\n";
+			$Settings = DBRetrieveSettings($MsgParameters[2]);
+			$SensorSettings = DBBaseStationSensorSettings($MsgParameters[2]);
+			$str = sprintf("OK %d %d %d %d %d %d %d", $Settings['Enable'], $Settings['Buzzer'], $Settings['Propagation'],$SensorSettings[1],$SensorSettings[2],$SensorSettings[3],$SensorSettings[4]);
+			echo("Sent: "); echo($str);
                         socket_write($socket, $str, strlen($str));
 			
                         break;
@@ -532,9 +542,7 @@ echo"4 Arg: ";echo$MsgParameters[3];echo"_";echo"\n";
                 }
 
             
-            default:
-                echo "Default\n";
-                break;
+
         }
 	
     
