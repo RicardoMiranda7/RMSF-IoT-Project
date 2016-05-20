@@ -228,6 +228,31 @@ return $BuzzerPropagation;
 
 }
 
+function DBRetrieveSensorSettings($PANid){
+   $dsn = sprintf("mysql:host=%s;dbname=%s", HOST, USER);
+   try{
+            $connection = new PDO($dsn, USER, PASS);
+    }
+    catch(PDOException $exception){
+        echo($exception->getMessage());exit();
+    }
+    $RetrieveSensorSettings= "SELECT DISTINCT idNode,Activated FROM Node NATURAL JOIN PersonPAN WHERE idPAN = '$PANid' ;";
+    $Result = $connection->prepare($RetrieveSensorSettings);
+$Result->execute();
+    if ( $Result  == FALSE){
+        $info = $connection->errorInfo();echo("Error: {$info[2]}\n");exit();
+    }
+$SensorSetsStr = "";
+	while($row = $Result->fetch(PDO::FETCH_ASSOC)){
+		echo("row: ");echo($row['idNode']);echo(" ");echo($row['Activated']);
+		$SensorSetsStr.= " " . $row['idNode'] . " " . $row['Activated'];
+		
+ }echo($SensorSetsStr);
+return $SensorSetsStr;
+//echo("idPAN: " + $Result->idPAN + "	Buzzer: " + $Result->Buzzer + "\n");
+
+
+}
 
 function AccessDatabaseLogin($Email, $Passwd){
    $dsn = sprintf("mysql:host=%s;dbname=%s", HOST, USER);
@@ -534,9 +559,11 @@ echo"Newbuf: [";echo $buf;echo"] ";echo"\n";
                         break;
                     case 'RETRIEVE':
 						echo "[RETRIEVE]\n";
+ $SensorSetsStr = DBRetrieveSensorSettings($MsgParameters[2]);
 						$Settings = DBRetrieveSettings($MsgParameters[2]);
 						$str = sprintf("OK %d %d %d", $Settings['Enable'], $Settings['Buzzer'], $Settings['Propagation']);
-						echo("Sent: "); echo($str);
+$str.=$SensorSetsStr;						
+echo("Sent: "); echo($str);
                         socket_write($socket, $str, strlen($str));
 			
                         break;
