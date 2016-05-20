@@ -317,7 +317,7 @@ function SendMail($Email, $Name,$GeneratedPasswd)
 	mail($to, $subject, $message, $headers);
 }
 
-function DBModifyBuzzer($PANid, $Parameter, $value){
+function DBModifyBuzzer($PANid, $Parameter, $value, $idNode){
    $dsn = sprintf("mysql:host=%s;dbname=%s", HOST, USER);
    try{
             $connection = new PDO($dsn, USER, PASS);
@@ -334,6 +334,9 @@ function DBModifyBuzzer($PANid, $Parameter, $value){
 			break;
 		case "ENABLE":
 			$Modify = "UPDATE PAN SET Enable = '$value' WHERE idPAN = '$PANid'";			
+			break;
+		case "SENSOR":
+			$Modify = "UPDATE Node SET Activated = '$value' WHERE idPAN = '$PANid' AND idNode = '$idNode'";			
 			break;
 	}
    
@@ -554,7 +557,7 @@ echo"Newbuf: [";echo $buf;echo"] ";echo"\n";
                         break;  
                     case 'MODIFY':
                         echo "[MODIFY]\n";
-						$str = DBModifyBuzzer($MsgParameters[2], $MsgParameters[3], $MsgParameters[4]);
+			$str = DBModifyBuzzer($MsgParameters[2], $MsgParameters[3], $MsgParameters[4], $MsgParameters[5]);
                         socket_write($socket, $str, strlen($str));
                         break;
                     case 'RETRIEVE':
