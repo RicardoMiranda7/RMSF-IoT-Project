@@ -1,6 +1,7 @@
 package com.example.jose_trabalho.myapplication;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +19,7 @@ import java.lang.Thread;
 import java.lang.Runnable;
 import android.app.AlertDialog;
 import android.os.Vibrator;
-
+import android.content.Intent;
 
 
 /**
@@ -27,12 +28,14 @@ import android.os.Vibrator;
 public class MyService extends Service{
     // Flag para sair do ciclo de background
     boolean flag = true;
-
+    String Email;
+    String ServerIP;
     public static String message;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
     }
 
     public final class ThreadClass implements Runnable
@@ -52,9 +55,9 @@ public class MyService extends Service{
             //   da aplicacao.
             synchronized (this) {
                 while(flag){
-                    // Inicar o soocket
-                    ClientJava client = new ClientJava("192.168.0.105",1907);
-                    client.send_message("JAVA\n");
+                    // Inicar o socket
+                    ClientJava client = new ClientJava(ServerIP,new IPandPORT().PHPServer_Port);
+                    client.send_message("JAVA NOTIFICATION "+ Email + "\n");
                      message = client.receive_message();
                     if(message != null) {
                         if (message.regionMatches(0, "ALARM", 0, 5)) {
@@ -69,6 +72,12 @@ public class MyService extends Service{
                                     mBuilder.setSmallIcon(R.raw.intruder_alarm_icon);
                                     mBuilder.setContentTitle("Motion detected!");
                                     mBuilder.setContentText("A sensor has triggered the system at " + message);
+                                    Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
+
+                                    PendingIntent resultPendingIntent =
+                                            PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                                            );
+                                    mBuilder.setContentIntent(resultPendingIntent);
                                     NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                                     int notificationID = 2;
                                     // notificationID allows you to update the notification later on.
@@ -110,7 +119,10 @@ public class MyService extends Service{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Toast.makeText(this, "Started client in BG. Will query the server every 5 seconds for new alarms.", Toast.LENGTH_LONG).show();
+        Email = intent.getStringExtra("Email");
+        ServerIP = intent.getStringExtra("ServerIP");
+
+        Toast.makeText(this, "Started client in BG. Will query " + ServerIP + " every 5 seconds for new alarms for " + Email, Toast.LENGTH_LONG).show();
         // Iniciar a thread com o servico de cliente
         Thread thread = new Thread(new ThreadClass(startId));
         thread.start();

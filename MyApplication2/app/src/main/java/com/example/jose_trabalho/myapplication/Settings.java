@@ -56,7 +56,7 @@ public class Settings extends AppCompatActivity {
 
     public void toggleBuzzer(View view) {
         Buzzer = !Buzzer;
-        new ModifyTask().execute(PANid, "BUZZER", String.valueOf(Buzzer));
+        new ModifyTask().execute(PANid, "BUZZER", String.valueOf(Buzzer),"GenSettings");
     }
 
     public void toggleEnableAlarm(View view) {
@@ -92,7 +92,7 @@ public class Settings extends AppCompatActivity {
 
         new GetSettingsTask().execute(PANid);
         try {
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.SECONDS.sleep(2);
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -113,7 +113,7 @@ public class Settings extends AppCompatActivity {
 
 
         //Passa-las para a interface gráfica
-        swAlarmEnable.setChecked(Buzzer);
+        swAlarmEnable.setChecked(AlarmSysEnabled);
         swBuzzer.setChecked(Buzzer);
         Log.d("Buzzer2: ", String.valueOf(Buzzer));
         swPropagation.setChecked(Propagation);
@@ -129,7 +129,7 @@ public class Settings extends AppCompatActivity {
             Log.d("i:", String.valueOf(i));
             sSensors[i] = "ID: " + sensors[i].ID + "                      Enabled: " + String.valueOf(sensors[i].enabled);
 
-          /*  if (sensors[i].enabled == true) {
+          /* if (sensors[i].enabled == true) {
                 lvSensors.getChildAt(lvSensors.getFirstVisiblePosition()).setBackgroundColor(0x458B00);
 
             } else {
@@ -158,7 +158,7 @@ public class Settings extends AppCompatActivity {
 
                 Log.d("Position: ", String.valueOf(position));
                 Log.d("ID: ", String.valueOf(id));
-                new ModifyTask().execute(PANid, String.valueOf(position + 1), String.valueOf(sensors[position].enabled), "GenSettings");
+                new ModifyTask().execute(PANid, String.valueOf(sensors[position].enabled ? 1 : 0),String.valueOf(sensors[position].ID), "Sensor");
 
             }
         });
@@ -180,8 +180,8 @@ public class Settings extends AppCompatActivity {
                 case "GenSettings":
                     clientRegister.send_message("JAVA MODIFY " + strings[0] + " " + strings[1] + " " + (Boolean.parseBoolean(strings[2]) ? 1 : 0) + "\n");
                     break;
-                case "Sensors":
-                    clientRegister.send_message("JAVA MODIFY " + strings[0] + " " + strings[1] + " " + (Boolean.parseBoolean(strings[2]) ? 1 : 0) + "\n");
+                case "Sensor":
+                    clientRegister.send_message("JAVA MODIFY " + strings[0] + " SENSOR " + strings[1] +" " + strings[2] + "\n");
                     break;
             }
             message = clientRegister.receive_message();
@@ -232,7 +232,7 @@ public class Settings extends AppCompatActivity {
                     Propagation = Integer.parseInt(parts[3]) != 0;
 
                     int j = 0;
-                    for (int i = 4; i < parts.length; i = i + 2) {
+                    for (int i = 4; i < parts.length-1; i+=2) {
                         sensors[j].ID = parts[i];
                         sensors[j].enabled = Integer.parseInt(parts[i + 1]) != 0;
                         j++;

@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ServerIP = etServerIP.getText().toString();
+                Email = etEmail.getText().toString();
                 if(!ServerIP.isEmpty() && !etEmail.getText().toString().isEmpty() && !etPassword.getText().toString().isEmpty()) {
                     new LoginTask().execute(etEmail.getText().toString(), etPassword.getText().toString());
                 }
@@ -131,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
             if (UserFeedback.equals("Login Successful!")){
                 Intent UserAreaIntent = new Intent(MainActivity.this, UserArea.class);
                 UserAreaIntent.putExtra("ServerIP",ServerIP);
+                UserAreaIntent.putExtra("Email",Email);
                 MainActivity.this.startActivity(UserAreaIntent);
             }
 

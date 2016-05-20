@@ -3,6 +3,7 @@ package com.example.jose_trabalho.myapplication;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.widget.ListView;
 public class UserArea extends AppCompatActivity {
     public static Handler UIHandler;
     String ServerIP;
+    String Email;
     static
     {
         UIHandler = new Handler(Looper.getMainLooper());
@@ -30,6 +32,7 @@ public class UserArea extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             ServerIP = extras.getString("ServerIP");
+            Email = extras.getString("Email");
         }
 
         //Login Fields
@@ -74,6 +77,8 @@ public class UserArea extends AppCompatActivity {
     public void startService(View view)
     {
         Intent intent =  new Intent(this,MyService.class);
+        intent.putExtra("Email", Email);
+        intent.putExtra("ServerIP", ServerIP);
         startService(intent);
     }
 
