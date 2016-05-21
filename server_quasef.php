@@ -1,6 +1,6 @@
 #!/usr/bin/php -q 
 <?php 
-define("IPServer", "192.168.0.106");
+define("IPServer", "192.168.0.101");
 define("PORTServer", 1901);
 define("HOST","db.ist.utl.pt");
 define("USER", "ist175847");
@@ -141,6 +141,7 @@ function handle_client($ssock, $csock)
         socket_close($ssock); 
         interact($csock); 
         socket_close($csock); 
+        //exit();
     }else 
     { 
         socket_close($csock); 
@@ -586,7 +587,6 @@ echo"NOtification Resquest\n";
                 break;
         }
 	
-    
 } 
 
 /** 
