@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -115,11 +116,12 @@ public class MainActivity extends AppCompatActivity {
             //Se a comunicacao c/base de dados for bem sucedida
             if(message!=null) {
                 if (message.regionMatches(0, "OK", 0, 2)) {
-
+                    String[] parts = message.split(" ");
+                    PANid = parts[1];
                     return Userfeedback = "Login Successful!";
 
                 } else if (message.regionMatches(0, "NOK EMAIL", 0, 9)) {
-                    return Userfeedback = "Email adress not found.";
+                    return Userfeedback = "Email address not found.";
                 } else if (message.regionMatches(0, "NOK PASSWD", 0, 10)) {
                     return Userfeedback = "Password does not match Email.";
                 }
@@ -133,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent UserAreaIntent = new Intent(MainActivity.this, UserArea.class);
                 UserAreaIntent.putExtra("ServerIP",ServerIP);
                 UserAreaIntent.putExtra("Email",Email);
+                UserAreaIntent.putExtra("PANid",PANid);
+
                 MainActivity.this.startActivity(UserAreaIntent);
             }
 

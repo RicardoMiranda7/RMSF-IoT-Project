@@ -134,7 +134,7 @@
         android:id="@+id/etServerIP"
         android:textSize="24dp"
         android:textAlignment="center"
-        android:hint="Server IP Adress"
+        android:hint="Server IP Address"
         android:layout_alignBottom="@+id/tvEmailError"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

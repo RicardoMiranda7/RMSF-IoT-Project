@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
         android:text=""
-        android:hint="Email Adress"
+        android:hint="Email Address"
         android:ems="10"
         android:id="@+id/etEmail"
         android:textSize="24sp"

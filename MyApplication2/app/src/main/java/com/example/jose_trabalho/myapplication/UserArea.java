@@ -12,11 +12,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class UserArea extends AppCompatActivity {
     public static Handler UIHandler;
     String ServerIP;
     String Email;
+    String PANid;
     static
     {
         UIHandler = new Handler(Looper.getMainLooper());
@@ -33,6 +35,7 @@ public class UserArea extends AppCompatActivity {
         if (extras != null) {
             ServerIP = extras.getString("ServerIP");
             Email = extras.getString("Email");
+            PANid = extras.getString("PANid");
         }
 
         //Login Fields
@@ -59,10 +62,13 @@ public class UserArea extends AppCompatActivity {
                     case 0:
                        intent = new Intent(UserArea.this, Settings.class);
                         intent.putExtra("ServerIP",ServerIP);
+                        intent.putExtra("PANid",PANid);
                         startActivity(intent);
                         break;
                     case 1:
                         intent = new Intent(UserArea.this, Records.class);
+                        intent.putExtra("ServerIP",ServerIP);
+                        intent.putExtra("PANid",PANid);
                         startActivity(intent);
                         break;
 
@@ -71,8 +77,6 @@ public class UserArea extends AppCompatActivity {
             }
         });
     }
-
-
 
     public void startService(View view)
     {

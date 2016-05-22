@@ -45,7 +45,7 @@ public class Settings extends AppCompatActivity {
     public boolean Buzzer;
     public boolean Propagation;
     public boolean AlarmSysEnabled;
-    String PANid = "20";
+    String PANid;
     String ServerIP;
     Switch swBuzzer;
     Switch swPropagation;
@@ -77,6 +77,7 @@ public class Settings extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             ServerIP = extras.getString("ServerIP");
+            PANid = extras.getString("PANid");
         }
 
         for (int i = 0; i < sensors.length; i++) {
