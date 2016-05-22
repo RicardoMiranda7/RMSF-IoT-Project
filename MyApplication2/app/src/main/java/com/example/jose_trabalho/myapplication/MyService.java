@@ -57,7 +57,7 @@ public class MyService extends Service{
                 while(flag){
                     // Inicar o socket
                     ClientJava client = new ClientJava(ServerIP,new IPandPORT().PHPServer_Port);
-                    client.send_message("JAVA NOTIFICATION "+ Email + "\n");
+                    client.send_message("ANDROID NOTIFICATION "+ Email + "\n");
                      message = client.receive_message();
                     if(message != null) {
                         if (message.regionMatches(0, "ALARM", 0, 5)) {

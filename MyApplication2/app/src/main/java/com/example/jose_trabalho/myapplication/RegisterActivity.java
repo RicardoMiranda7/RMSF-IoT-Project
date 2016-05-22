@@ -28,7 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
             String message, Userfeedback;
             // Pedido à base de dados
             ClientJava clientRegister = new ClientJava(ServerIP, new IPandPORT().PHPServer_Port);
-            clientRegister.send_message("JAVA REGISTER " + strings[0] + " " + strings[1] + " " + strings[2] + " " + strings[3]+"\n");
+            clientRegister.send_message("ANDROID REGISTER " + strings[0] + " " + strings[1] + " " + strings[2] + " " + strings[3]+"\n");
             message = clientRegister.receive_message();
             try {
                 clientRegister.Close();

@@ -101,7 +101,7 @@ public class Records extends AppCompatActivity {
         public void run() {
             ClientJava clientRegister = new ClientJava(ServerIP, new IPandPORT().PHPServer_Port);
             // strings[0] = PAN ID
-            clientRegister.send_message("JAVA RECORDS " + PANid + "\n");
+            clientRegister.send_message("ANDROID RECORDS " + PANid + "\n");
             String message = clientRegister.receive_message();
 
             if (message != null) {

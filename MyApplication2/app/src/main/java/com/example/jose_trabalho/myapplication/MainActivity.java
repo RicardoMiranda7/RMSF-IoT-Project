@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             String message, Userfeedback;
             // Pedido à base de dados
             ClientJava clientRegister = new ClientJava(ServerIP, new IPandPORT().PHPServer_Port);
-            clientRegister.send_message("JAVA LOGIN " + strings[0] + " " + strings[1] + "\n");
+            clientRegister.send_message("ANDROID LOGIN " + strings[0] + " " + strings[1] + "\n");
             message = clientRegister.receive_message();
             try {
                 clientRegister.Close();
